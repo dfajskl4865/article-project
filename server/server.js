@@ -133,6 +133,40 @@ app.post("/login", async (req, res) => {
   res.send(result);
 });
 
+app.get("/article", async (req, res) => {
+  const article = await 디비실행(`SELECT * FROM article`);
+  res.send(article);
+});
+
+app.post("/article", async (req, res) => {
+  const { title, body } = req.body;
+  const { loginUser } = req.session;
+
+  const result = {
+    code: "success",
+    message: "작성되었습니다",
+  };
+
+  if (title === "") {
+    result.code = "fail";
+    result.message = "제목을 작성해주세요";
+  }
+
+  if (body === "") {
+    result.code = "fail";
+    result.message = "내용을 작성해주세요";
+  }
+
+  if (result.code === "fail") {
+    res.send(result);
+    return;
+  }
+
+  const query = `INSERT INTO article(title,body,user_seq) VALUES('${title}','${body}','${loginUser.seq}')`;
+  await 디비실행(query);
+  res.send(result);
+});
+
 app.listen(port, () => {
   console.log("서버가 시작되었습니다");
 });
