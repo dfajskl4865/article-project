@@ -92,7 +92,7 @@ function Login() {
   return (
     <div>
       <input name="id" onChange={데이터변경} />
-      <input name="pw" onChange={데이터변경} />
+      <input type="password" name="pw" onChange={데이터변경} />
       <button type="button" onClick={로그인}>
         로그인
       </button>
@@ -101,7 +101,14 @@ function Login() {
 }
 
 function Main() {
-  return <div>Main</div>;
+  const { loginUser } = React.useContext(StoreContext);
+
+  console.log(loginUser);
+  return (
+    <div>
+      <h2>{loginUser.nickname}님 안녕하세요!</h2>
+    </div>
+  );
 }
 
 /**
