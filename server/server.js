@@ -133,8 +133,26 @@ app.post("/login", async (req, res) => {
   res.send(result);
 });
 
+app.get("/article_row", async (req, res) => {
+  const { seq } = req.query;
+
+  const query = `SELECT * FROM article WHERE seq = '${seq}'`;
+
+  const reply_query = `SELECT * FROM reply WHERE article_seq = '${seq}'`;
+
+  const article = await 디비실행(query);
+  const reply = await 디비실행(reply_query);
+
+  res.send({
+    article: article[0],
+    reply: reply,
+  });
+});
+
 app.get("/article", async (req, res) => {
-  const article = await 디비실행(`SELECT * FROM article`);
+  const query = `SELECT * FROM article , user WHERE article.user_seq = user.seq`;
+
+  const article = await 디비실행(query);
   res.send(article);
 });
 
@@ -164,6 +182,33 @@ app.post("/article", async (req, res) => {
 
   const query = `INSERT INTO article(title,body,user_seq) VALUES('${title}','${body}','${loginUser.seq}')`;
   await 디비실행(query);
+  res.send(result);
+});
+
+app.post("/reply", async (req, res) => {
+  const { seq, replyText } = req.body;
+  const { loginUser } = req.session;
+
+  const result = {
+    code: "success",
+    message: "댓글이 작성되었습니다",
+  };
+
+  if (replyText === "") {
+    result.code = "errer";
+    result.message = "댓글을 입력해주세요";
+  }
+
+  if (result.code === "errer") {
+    res.send(result);
+    return;
+  }
+
+  const query = `INSERT INTO reply(body,article_seq,user_seq) VALUES('${replyText}','${seq}','${loginUser.seq}')`;
+
+  console.log(query);
+  await 디비실행(query);
+
   res.send(result);
 });
 
